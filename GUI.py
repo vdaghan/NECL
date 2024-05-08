@@ -7,6 +7,7 @@ from utils import parseRSS
 from utils import downloadPodcast, getFilenames
 from utils import convertMP3ToWav
 from Recogniser import recognise
+from StatusBar import StatusBar
 
 
 class GUI:
@@ -16,8 +17,9 @@ class GUI:
 
         self.root = tkinter.Tk()
         self.root.title('NECL!')
-        self.root.geometry("640x120")
         self.mainframe = tkinter.ttk.Frame(self.root)
+
+        self.statusBar = StatusBar(self.mainframe)
 
         self.rssButton = tkinter.ttk.Button(self.mainframe, text="RSS", command = self.rssButtonPressed)
         self.downloadButton = tkinter.ttk.Button(self.mainframe, text="Download", command = self.downloadButtonPressed)
@@ -33,9 +35,10 @@ class GUI:
         self.assignTimePassed(0)
 
         # self.playStatus = 'NA'
-        self.text = tkinter.Text(self.mainframe, wrap = "word")
+        self.text = tkinter.Text(self.mainframe, width=60, height=5, wrap = "word")
 
-        self.mainframe.grid(column=0, row=0, columnspan=7, rowspan=2)
+        self.mainframe.grid(column=0, row=0, columnspan=7, rowspan=3)
+        self.statusBar.grid(column = 0, row = 2, columnspan = 7, sticky = tkinter.W)
         self.rssButton.grid(column=1, row=0)
         self.downloadButton.grid(column=2, row=0)
         self.convertButton.grid(column=3, row=0)
@@ -51,24 +54,24 @@ class GUI:
         rssLink = "https://cppcast.com/feed.rss"
         parseResults = parseRSS(rssLink)
         self.link, self.title = parseResults[0]
-        self.root.title(self.title)
-        print("rssButtonPressed")
+        self.root.title("NECL! - " + self.title)
+        self.statusBar.set("rssButtonPressed")
 
     def downloadButtonPressed(self):
         self.filenames = getFilenames(self.link)
         downloadResult = downloadPodcast(self.filenames)
-        print("downloadButtonPressed")
+        self.statusBar.set("downloadButtonPressed")
 
     def convertButtonPressed(self):
         conversionResult = convertMP3ToWav(self.filenames)
-        print("convertButtonPressed")
+        self.statusBar.set("convertButtonPressed")
 
     def recogniseButtonPressed(self):
         try:
             self.json = recognise(self.filenames)
         except Exception as e:
             tkinter.messagebox.showerror("Recognition Error", str(e))
-        print("recogniseButtonPressed")
+        self.statusBar.set("recogniseButtonPressed")
 
     def assignTimePassed(self, ms):
         timeDelta = datetime.timedelta(milliseconds=ms)
@@ -88,7 +91,7 @@ class GUI:
             pygame.mixer.music.unpause()
             self.playButtonText.set('Pause')
             self.root.after(100, self.loop)
-        print("playButtonPressed")
+        self.statusBar.set("playButtonPressed")
 
     def loop(self):
         if not 'Pause' == self.playButtonText.get():

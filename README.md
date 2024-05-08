@@ -14,6 +14,7 @@
  This program currently looks up the latest CppCast podcast, downloads (as mp3), converts (to wav), decodes (as json) and plays it together with transcriptions.
 
 # TODO
+ * Ability to choose vosk model.
  * Accept any podcast link in mp3 format.
  * Generalise to other formats.
  * List and choose a podcast from CppCast RSS link.
